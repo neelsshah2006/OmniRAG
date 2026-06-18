@@ -1,0 +1,100 @@
+# =====================
+# Python
+# =====================
+
+__pycache__/
+*.py[cod]
+*.pyo
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+
+# =====================
+# Virtual environments
+# =====================
+
+.venv/
+venv/
+
+
+# =====================
+# Environment variables
+# =====================
+
+.env
+.env.*
+
+
+# Keep examples
+!.env.example
+
+
+# =====================
+# Logs
+# =====================
+
+logs/
+*.log
+
+
+# =====================
+# IDE
+# =====================
+
+.vscode/
+.idea/
+
+
+# =====================
+# OS
+# =====================
+
+.DS_Store
+Thumbs.db
+
+
+# =====================
+# Docker
+# =====================
+
+*.pid
+
+
+# =====================
+# AI / ML artifacts
+# =====================
+
+models/
+checkpoints/
+
+*.pt
+*.pth
+*.onnx
+
+
+# =====================
+# Vector DB local data
+# =====================
+
+qdrant_storage/
+chroma/
+
+
+# =====================
+# Node / Frontend
+# =====================
+
+node_modules/
+
+dist/
+build/
+
+
+# =====================
+# Coverage
+# =====================
+
+.coverage
+htmlcov/
