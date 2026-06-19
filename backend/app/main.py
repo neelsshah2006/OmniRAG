@@ -1,7 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+
 from app.core.config import get_settings
 from app.core.logging import setup_logging, logger
+from app.core.exceptions import (
+    OmniRAGException,
+    omnirag_exception_handler,
+)
 
 settings = get_settings()
 
@@ -19,6 +24,11 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.API_VERSION,
     lifespan=lifespan,
+)
+
+app.add_exception_handler(
+    OmniRAGException,
+    omnirag_exception_handler,
 )
 
 
