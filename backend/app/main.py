@@ -8,12 +8,15 @@ from app.core.exceptions import (
     omnirag_exception_handler,
 )
 
+from app.middleware.request import RequestMiddleware
+
 settings = get_settings()
+
+setup_logging()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    setup_logging()
     logger.info("Starting OmniRAG server")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     yield
@@ -30,6 +33,8 @@ app.add_exception_handler(
     OmniRAGException,
     omnirag_exception_handler,
 )
+
+app.add_middleware(RequestMiddleware)
 
 
 @app.get("/health")
