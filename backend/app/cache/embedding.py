@@ -19,8 +19,8 @@ class EmbeddingCache:
     ) -> str:
 
         return generate_cache_key(
-            text,
             model,
+            text,
         )
 
     async def get_embedding(

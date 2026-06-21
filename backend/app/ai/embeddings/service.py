@@ -5,6 +5,7 @@ from app.ai.embeddings.provider.sentence_transformer import (
     SentenceTransformerProvider,
 )
 from app.core.logging import logger
+from app.cache.embedding import embedding_cache
 
 
 class EmbeddingService:
@@ -28,7 +29,24 @@ class EmbeddingService:
         if not text.strip():
             raise ValueError("Cannot embed empty text")
 
-        return await self.provider.embed_text(text)
+        cached_embedding = await embedding_cache.get_embedding(
+            text=text,
+            model=self.model_name,
+        )
+
+        if cached_embedding is not None:
+            logger.debug("Embedding cache hit")
+            return cached_embedding
+
+        logger.debug("Embedding cache miss")
+        embedding = await self.provider.embed_text(text)
+        await embedding_cache.set_embedding(
+            text=text,
+            model=self.model_name,
+            embedding=embedding,
+        )
+
+        return embedding
 
     async def embed_batch(
         self,
