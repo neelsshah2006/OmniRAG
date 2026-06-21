@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
 
+    # Embeddings
+    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
+    EMBEDDING_DIMENSION: int = 384
+
     @computed_field
     @property
     def REDIS_URL(self) -> str:

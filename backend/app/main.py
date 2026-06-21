@@ -13,6 +13,7 @@ from app.core.exceptions import (
     omnirag_exception_handler,
 )
 from app.core.redis import redis_manager
+from app.ai.embeddings.service import init_embedding_service
 
 from app.middleware.request import RequestMiddleware
 
@@ -29,6 +30,10 @@ async def lifespan(app: FastAPI):
     # Connect infrastructure services
     await redis_manager.connect()
     logger.info("Redis connected")
+
+    # Load AI services
+    await init_embedding_service()
+    logger.info("Embedding service loaded")
 
     yield
 
