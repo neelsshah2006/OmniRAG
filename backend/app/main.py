@@ -13,7 +13,14 @@ from app.core.exceptions import (
     omnirag_exception_handler,
 )
 from app.core.redis import redis_manager
-from app.ai.embeddings.service import init_embedding_service
+from app.ai.embeddings.service import (
+    init_embedding_service,
+    get_embedding_service,
+)
+from app.storage.vector.service import (
+    init_vector_service,
+    close_vector_service,
+)
 
 from app.middleware.request import RequestMiddleware
 
@@ -27,17 +34,27 @@ async def lifespan(app: FastAPI):
     logger.info("Starting OmniRAG server")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
 
-    # Connect infrastructure services
+    # Infrastructure
     await redis_manager.connect()
     logger.info("Redis connected")
 
-    # Load AI services
+    # AI services
     await init_embedding_service()
+    embedding_service = get_embedding_service()
     logger.info("Embedding service loaded")
+
+    # Vector database
+    await init_vector_service(dimension=embedding_service.dimension)
+    logger.info("Vector Service loaded")
+
+    logger.info("OmniRAG services ready")
 
     yield
 
-    # Shutdown services gracefully
+    # Shutdown
+    await close_vector_service()
+    logger.info("Qdrant Closed")
+
     await redis_manager.close()
     logger.info("Redis disconnected")
 
