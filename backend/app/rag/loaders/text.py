@@ -1,19 +1,34 @@
 from pathlib import Path
 import uuid
 
-from app.rag.ingestion.models import Document
+from app.rag.ingestion.models import Document, DocumentElement
 from app.rag.loaders.base import DocumentLoader
 
 MAX_FILE_SIZE_MB = 25
 
 
 class TextLoader(DocumentLoader):
+    """
+    Loader for plain text based documents.
+    """
+
     async def load(self, path: Path) -> Document:
         self._validate(path)
         content = path.read_text(encoding="utf-8")
+        element = DocumentElement(
+            id=str(uuid.uuid4()),
+            type="Text",
+            element_index=0,
+            content=content,
+            metadata={
+                "filename": path.name,
+                "extension": path.suffix,
+            },
+        )
+
         return Document(
             id=str(uuid.uuid4()),
-            content=content,
+            elements=[element],
             metadata={
                 "filename": path.name,
                 "extension": path.suffix,

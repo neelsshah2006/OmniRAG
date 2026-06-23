@@ -47,6 +47,7 @@ class IngestionPipeline:
                         "text": chunk.content,
                         "document_id": chunk.document_id,
                         "chunk_index": chunk.chunk_index,
+                        "element_ids": chunk.element_ids,
                         **chunk.metadata,
                     },
                 )
