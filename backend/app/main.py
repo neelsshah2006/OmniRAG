@@ -21,6 +21,7 @@ from app.storage.vector.service import (
     init_vector_service,
     close_vector_service,
 )
+from app.ai.llm.service import llm_service
 
 from app.middleware.request import RequestMiddleware
 
@@ -46,6 +47,10 @@ async def lifespan(app: FastAPI):
     # Vector database
     await init_vector_service(dimension=embedding_service.dimension)
     logger.info("Vector Service loaded")
+
+    # LLM service
+    llm_service.initialize()
+    logger.info("LLM Service loaded")
 
     logger.info("OmniRAG services ready")
 

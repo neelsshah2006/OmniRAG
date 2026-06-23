@@ -30,20 +30,23 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
 
+    @computed_field
+    @property
+    def REDIS_URL(self) -> str:
+        return f"redis://{self.REDIS_HOST}:" f"{self.REDIS_PORT}/{self.REDIS_DB}"
+
     # Qdrant
     QDRANT_HOST: str = "localhost"
     QDRANT_PORT: int = 6333
-
     QDRANT_COLLECTION: str = "omnirag_chunks"
 
     # Embeddings
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIMENSION: int = 384
 
-    @computed_field
-    @property
-    def REDIS_URL(self) -> str:
-        return f"redis://{self.REDIS_HOST}:" f"{self.REDIS_PORT}/{self.REDIS_DB}"
+    # Groq
+    GROQ_API_KEY: str
+    GROQ_MODEL: str = "llama-3.1-8b-instant"
 
     model_config = SettingsConfigDict(
         env_file=".env",
