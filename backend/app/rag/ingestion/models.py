@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class DocumentElement(BaseModel):
@@ -9,6 +9,8 @@ class DocumentElement(BaseModel):
 
     Created by loaders/parsers.
     """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     id: str
     type: str
@@ -19,6 +21,7 @@ class DocumentElement(BaseModel):
     content: str | None = None
     element_index: int
     metadata: dict[str, Any] = Field(default_factory=dict)
+    source_element: Any | None = None
 
 
 class Document(BaseModel):

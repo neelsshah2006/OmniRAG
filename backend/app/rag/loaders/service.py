@@ -3,6 +3,7 @@ from pathlib import Path
 from app.rag.ingestion.models import Document
 from app.rag.loaders.base import DocumentLoader
 from app.rag.loaders.text import TextLoader
+from app.rag.loaders.unstructured import UnstructuredLoader
 
 
 class LoaderService:
@@ -14,9 +15,12 @@ class LoaderService:
     def __init__(
         self,
     ):
-        self.loaders: dict[str, DocumentLoader] = {
+        self.loaders = {
             ".txt": TextLoader(),
             ".md": TextLoader(),
+            ".pdf": UnstructuredLoader(),
+            ".docx": UnstructuredLoader(),
+            ".pptx": UnstructuredLoader(),
         }
 
     async def load(
