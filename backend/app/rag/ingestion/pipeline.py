@@ -4,14 +4,18 @@ from app.storage.vector.service import get_vector_service
 from app.storage.vector.models import VectorDocument
 from app.rag.chunking.service import chunking_service
 from app.rag.ingestion.models import Document
+from app.rag.processors.service import processor_pipeline
 
 
 class IngestionPipeline:
     """
-    Converts raw documents into searchable knowledge.
+    Converts parsed documents into searchable knowledge.
 
     Flow:
+
     Document
+        ↓
+    Process / Enrich
         ↓
     Chunk
         ↓
@@ -23,14 +27,16 @@ class IngestionPipeline:
     async def ingest(self, document: Document) -> int:
         logger.info(f"Starting Ingestion: {document.id}")
 
-        # 1. Chunk Document
+        # 1. Process Document
+        document = await processor_pipeline.process(document)
+
+        # 2. Chunk Document
         chunker = chunking_service.get_chunker(document)
         logger.info(f"Using chunker: {chunker.__class__.__name__}")
         chunks = chunker.chunk(document)
         logger.info(f"Created {len(chunks)} chunks")
 
-        # 2. Embed Chunks
-
+        # 3. Embed Chunks
         embedding_service = get_embedding_service()
         vector_service = get_vector_service()
         vector_documents = []
@@ -54,10 +60,14 @@ class IngestionPipeline:
                 )
             )
 
+        if not vector_documents:
+            logger.warning(f"No valid chunks generated for document: {document.id}")
+            return 0
+
         await vector_service.add_documents(vector_documents)
         logger.success(f"Ingested document: {document.id}")
 
-        return len(chunks)
+        return len(vector_documents)
 
 
 ingestion_pipeline = IngestionPipeline()

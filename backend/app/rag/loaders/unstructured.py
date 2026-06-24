@@ -48,9 +48,7 @@ class UnstructuredLoader(DocumentLoader):
             if element.category == "Table":
                 html = metadata.get("text_as_html")
                 if html:
-                    content = (
-                        "Table HTML:\n" + html + "\n\nTable Text:\n" + element.text
-                    )
+                    content = "Table HTML:\n" + html
             elements.append(
                 DocumentElement(
                     id=str(uuid.uuid4()),

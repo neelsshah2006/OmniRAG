@@ -12,6 +12,7 @@ from app.rag.chain.models import (
     SourceReference,
 )
 from app.rag.retrieval.context import context_builder
+from app.ai.prompts.rag import RAG_SYSTEM_PROMPT, build_rag_user_prompt
 
 
 class RAGChain:
@@ -33,33 +34,11 @@ class RAGChain:
         messages = [
             ChatMessage(
                 role="system",
-                content=("""
-You are OmniRAG, a reliable retrieval-augmented AI assistant.
-
-Your task is to answer user questions using ONLY the provided context.
-
-Rules:
-1. Ground every answer in the retrieved context.
-2. Do not use external knowledge unless explicitly requested.
-3. If the context does not contain enough information, say:
-   "I don't have enough information in the provided documents."
-4. Do not invent facts, numbers, names, dates, or sources.
-5. If multiple sources conflict, mention the conflict.
-6. Provide concise, clear answers.
-"""),
+                content=(RAG_SYSTEM_PROMPT),
             ),
             ChatMessage(
                 role="user",
-                content=f"""
-Context:
-
-{context}
-
-
-Question:
-
-{question}
-""",
+                content=build_rag_user_prompt(context=context, question=question),
             ),
         ]
 
