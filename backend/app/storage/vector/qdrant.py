@@ -1,13 +1,13 @@
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import (
     Distance,
-    VectorParams,
-    SparseVectorParams,
-    SparseVector,
+    Fusion,
+    FusionQuery,
     PointStruct,
     Prefetch,
-    FusionQuery,
-    Fusion,
+    SparseVector,
+    SparseVectorParams,
+    VectorParams,
 )
 
 from app.core.config import get_settings
@@ -19,7 +19,6 @@ settings = get_settings()
 
 
 class QdrantVectorStore(VectorStore):
-
     def __init__(self):
         self.client: AsyncQdrantClient | None = None
         self.collection = settings.QDRANT_COLLECTION

@@ -1,5 +1,4 @@
 from app.core.logging import logger
-
 from app.storage.database.base import Base
 from app.storage.database.session import engine
 

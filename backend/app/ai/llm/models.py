@@ -1,9 +1,9 @@
 from typing import Any
+
 from pydantic import BaseModel, Field
 
 
 class GenerationConfig(BaseModel):
-
     temperature: float = 0.2
     max_tokens: int = 1024
 

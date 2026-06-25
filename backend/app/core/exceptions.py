@@ -5,7 +5,6 @@ from app.core.logging import logger
 
 
 class OmniRAGException(Exception):
-
     def __init__(
         self,
         message: str,

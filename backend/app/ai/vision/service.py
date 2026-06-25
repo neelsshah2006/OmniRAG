@@ -1,8 +1,7 @@
-from app.core.logging import logger
-
 from app.ai.vision.base import VisionProvider
 from app.ai.vision.models import VisionResponse
 from app.ai.vision.providers.groq import GroqVisionProvider
+from app.core.logging import logger
 
 
 class VisionService:

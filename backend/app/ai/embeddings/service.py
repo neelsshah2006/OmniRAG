@@ -4,12 +4,11 @@ from app.ai.embeddings.base import EmbeddingProvider
 from app.ai.embeddings.provider.sentence_transformer import (
     SentenceTransformerProvider,
 )
-from app.core.logging import logger
 from app.cache.embedding import embedding_cache
+from app.core.logging import logger
 
 
 class EmbeddingService:
-
     def __init__(
         self,
         provider: EmbeddingProvider,

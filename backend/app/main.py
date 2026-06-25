@@ -3,32 +3,32 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from redis.exceptions import RedisError
 
+from app.ai.embeddings.service import (
+    get_embedding_service,
+    init_embedding_service,
+)
+from app.ai.llm.service import llm_service
+from app.ai.reranker.service import reranker_service
+from app.ai.sparse.service import sparse_embedding_service
+from app.ai.vision.service import vision_service
 from app.core.config import get_settings
-from app.core.logging import setup_logging, logger
 from app.core.exceptions import (
     OmniRAGException,
     omnirag_exception_handler,
 )
+from app.core.logging import logger, setup_logging
 from app.core.redis import redis_manager
-from app.ai.embeddings.service import (
-    init_embedding_service,
-    get_embedding_service,
-)
-from app.storage.vector.service import (
-    init_vector_service,
-    close_vector_service,
-)
-from app.ai.llm.service import llm_service
-from app.ai.vision.service import vision_service
-from app.rag.retrieval.service import retrieval_service
-from app.ai.sparse.service import sparse_embedding_service
-from app.ai.reranker.service import reranker_service
-from app.storage.database.init import init_database
-
 from app.middleware.request import RequestMiddleware
+from app.rag.retrieval.service import retrieval_service
+from app.storage.database.init import init_database
+from app.storage.vector.service import (
+    close_vector_service,
+    init_vector_service,
+)
 
 settings = get_settings()
 

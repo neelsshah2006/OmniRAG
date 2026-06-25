@@ -1,9 +1,9 @@
+from app.ai.embeddings.service import get_embedding_service
 from app.core.config import get_settings
 from app.core.logging import logger
-from app.ai.embeddings.service import get_embedding_service
-from app.storage.vector.service import get_vector_service
-from app.rag.retrieval.models import RetrievedChunk, RetrievalResult
+from app.rag.retrieval.models import RetrievalResult, RetrievedChunk
 from app.rag.retrieval.retrievers.base import BaseRetriever
+from app.storage.vector.service import get_vector_service
 
 settings = get_settings()
 
@@ -37,7 +37,6 @@ class DenseRetriever(BaseRetriever):
         chunks: list[RetrievedChunk] = []
         # 3. Convert Storage results into retrieval objects
         for result in results:
-
             chunks.append(
                 RetrievedChunk(
                     id=result.id,

@@ -1,16 +1,13 @@
 from groq import AsyncGroq
 
-from app.core.config import get_settings
-from app.core.logging import logger
-
 from app.ai.vision.base import VisionProvider
 from app.ai.vision.models import VisionResponse
+from app.core.config import get_settings
 
 settings = get_settings()
 
 
 class GroqVisionProvider(VisionProvider):
-
     def __init__(self):
         self.client = AsyncGroq(api_key=settings.GROQ_API_KEY)
         self.model = settings.GROQ_VISION_MODEL

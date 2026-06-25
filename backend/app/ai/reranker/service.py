@@ -1,10 +1,9 @@
-from app.core.logging import logger
 from app.ai.reranker.base import RerankerProvider
 from app.ai.reranker.providers.cross_encoder import CrossEncoderReranker
+from app.core.logging import logger
 
 
 class RerankerService:
-
     def __init__(self):
         self.provider: RerankerProvider | None = None
 

@@ -1,13 +1,11 @@
 import time
 
+from app.ai.reranker.service import reranker_service
 from app.core.config import get_settings
 from app.core.logging import logger
-
+from app.rag.query.service import query_service
 from app.rag.retrieval.models import RetrievalResult
 from app.rag.retrieval.service import retrieval_service
-from app.rag.query.service import query_service
-
-from app.ai.reranker.service import reranker_service
 
 settings = get_settings()
 

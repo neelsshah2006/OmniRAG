@@ -1,10 +1,11 @@
-from groq import AsyncGroq
 import time
 
-from app.core.logging import logger
-from app.core.config import get_settings
+from groq import AsyncGroq
+
 from app.ai.llm.base import LLMProvider
 from app.ai.llm.models import ChatMessage, GenerationConfig, LLMResponse
+from app.core.config import get_settings
+from app.core.logging import logger
 
 settings = get_settings()
 
@@ -64,7 +65,6 @@ class GroqProvider(LLMProvider):
             )
 
         except Exception:
-
             logger.exception(
                 "Groq generation failed",
                 model=self.model,

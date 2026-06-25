@@ -1,15 +1,15 @@
 import time
 
-from app.core.logging import logger
 from app.ai.llm.models import (
     ChatMessage,
     GenerationConfig,
 )
 from app.ai.llm.service import llm_service
-from app.rag.retrieval.pipeline import retrieval_pipeline
+from app.ai.prompts.rag import RAG_SYSTEM_PROMPT, build_rag_user_prompt
+from app.core.logging import logger
 from app.rag.chain.models import RAGResponse, SourceReference
 from app.rag.retrieval.context import context_builder
-from app.ai.prompts.rag import RAG_SYSTEM_PROMPT, build_rag_user_prompt
+from app.rag.retrieval.pipeline import retrieval_pipeline
 
 
 class RAGChain:

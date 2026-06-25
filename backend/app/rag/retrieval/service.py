@@ -8,7 +8,6 @@ settings = get_settings()
 
 
 class RetrievalService:
-
     def __init__(self):
         self.retriever: BaseRetriever | None = None
 

@@ -3,7 +3,6 @@ from app.rag.query.rewriter import query_rewriter
 
 
 class QueryService:
-
     async def process(
         self,
         query: str,

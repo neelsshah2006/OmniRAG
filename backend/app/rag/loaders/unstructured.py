@@ -1,13 +1,14 @@
-from pathlib import Path
 import uuid
+from pathlib import Path
+
 from unstructured.partition.auto import partition
 
 from app.core.logging import logger
-from app.rag.loaders.base import DocumentLoader
 from app.rag.ingestion.models import (
     Document,
     DocumentElement,
 )
+from app.rag.loaders.base import DocumentLoader
 
 MAX_FILE_SIZE_MB = 100
 

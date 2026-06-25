@@ -1,12 +1,12 @@
 import asyncio
 
-from app.core.config import get_settings
-from app.core.logging import logger
 from app.ai.embeddings.service import get_embedding_service
 from app.ai.sparse.service import sparse_embedding_service
-from app.storage.vector.service import get_vector_service
-from app.rag.retrieval.models import RetrievedChunk, RetrievalResult
+from app.core.config import get_settings
+from app.core.logging import logger
+from app.rag.retrieval.models import RetrievalResult, RetrievedChunk
 from app.rag.retrieval.retrievers.base import BaseRetriever
+from app.storage.vector.service import get_vector_service
 
 settings = get_settings()
 
@@ -40,7 +40,6 @@ class HybridRetriever(BaseRetriever):
         chunks: list[RetrievedChunk] = []
 
         for result in results:
-
             chunks.append(
                 RetrievedChunk(
                     id=result.id,

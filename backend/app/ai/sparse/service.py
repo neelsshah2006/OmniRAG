@@ -1,12 +1,11 @@
+from app.ai.sparse.providers.fastembed import FastEmbedProvider
 from app.core.config import get_settings
 from app.core.logging import logger
-from app.ai.sparse.providers.fastembed import FastEmbedProvider
 
 settings = get_settings()
 
 
 class SparseEmbeddingService:
-
     def __init__(self):
 
         self.provider = None

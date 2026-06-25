@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from app.rag.ingestion.models import Document
-from app.rag.loaders.base import DocumentLoader
 from app.rag.loaders.text import TextLoader
 from app.rag.loaders.unstructured import UnstructuredLoader
 

@@ -1,8 +1,8 @@
-from app.core.logging import logger
-from app.rag.processors.base import DocumentProcessor
-from app.rag.ingestion.models import Document
-from app.ai.vision.service import vision_service
 from app.ai.prompts.vision import DOCUMENT_IMAGE_ANALYSIS_PROMPT
+from app.ai.vision.service import vision_service
+from app.core.logging import logger
+from app.rag.ingestion.models import Document
+from app.rag.processors.base import DocumentProcessor
 
 
 class ImageProcessor(DocumentProcessor):

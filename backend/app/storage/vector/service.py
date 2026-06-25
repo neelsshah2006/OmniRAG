@@ -2,11 +2,11 @@ from typing import Optional
 
 from app.core.logging import logger
 from app.storage.vector.base import VectorStore
-from app.storage.vector.qdrant import QdrantVectorStore
 from app.storage.vector.models import (
     VectorDocument,
     VectorSearchResult,
 )
+from app.storage.vector.qdrant import QdrantVectorStore
 
 
 class VectorService:

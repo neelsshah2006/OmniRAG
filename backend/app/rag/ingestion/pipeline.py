@@ -1,13 +1,13 @@
 import asyncio
 
-from app.core.logging import logger
 from app.ai.embeddings.service import get_embedding_service
-from app.storage.vector.service import get_vector_service
-from app.storage.vector.models import VectorDocument, StoredSparseVector
+from app.ai.sparse.service import sparse_embedding_service
+from app.core.logging import logger
 from app.rag.chunking.service import chunking_service
 from app.rag.ingestion.models import Document
 from app.rag.processors.service import processor_pipeline
-from app.ai.sparse.service import sparse_embedding_service
+from app.storage.vector.models import StoredSparseVector, VectorDocument
+from app.storage.vector.service import get_vector_service
 
 
 class IngestionPipeline:

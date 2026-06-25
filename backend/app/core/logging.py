@@ -1,5 +1,7 @@
 import sys
+
 from loguru import logger
+
 
 def setup_logging():
     logger.remove()
@@ -26,5 +28,6 @@ def setup_logging():
         level="DEBUG",
         serialize=True,
     )
+
 
 __all__ = ["logger", "setup_logging"]

@@ -1,4 +1,3 @@
-from app.core.logging import logger
 from app.ai.llm.base import LLMProvider
 from app.ai.llm.models import (
     ChatMessage,
@@ -6,6 +5,7 @@ from app.ai.llm.models import (
     LLMResponse,
 )
 from app.ai.llm.providers.groq import GroqProvider
+from app.core.logging import logger
 
 
 class LLMService:

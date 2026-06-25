@@ -6,7 +6,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-
     # Application
     PROJECT_NAME: str = "OmniRAG"
     API_VERSION: str = "v1"
@@ -33,7 +32,7 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def REDIS_URL(self) -> str:
-        return f"redis://{self.REDIS_HOST}:" f"{self.REDIS_PORT}/{self.REDIS_DB}"
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
     # Qdrant
     QDRANT_HOST: str = "localhost"

@@ -6,7 +6,6 @@ from app.ai.embeddings.base import EmbeddingProvider
 
 
 class SentenceTransformerProvider(EmbeddingProvider):
-
     def __init__(
         self,
         model_name: str = "BAAI/bge-small-en-v1.5",

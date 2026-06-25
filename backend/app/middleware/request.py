@@ -21,7 +21,7 @@ class RequestMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
         process_time = round(time.time() - start_time, 4)
-        
+
         response.headers["X-Request-ID"] = request_id
         response.headers["X-Process-Time"] = str(process_time)
         logger.info(

@@ -1,4 +1,5 @@
 import uuid
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.rag.chunking.base import Chunker
@@ -9,7 +10,6 @@ from app.rag.ingestion.models import (
 
 
 class RecursiveChunker(Chunker):
-
     def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
@@ -31,7 +31,6 @@ class RecursiveChunker(Chunker):
         chunks = []
 
         for index, text in enumerate(texts):
-
             chunk_id = str(
                 uuid.uuid5(
                     uuid.NAMESPACE_DNS,

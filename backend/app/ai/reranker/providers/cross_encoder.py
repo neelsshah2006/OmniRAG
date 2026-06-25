@@ -1,15 +1,14 @@
 from sentence_transformers import CrossEncoder
 
-from app.core.config import get_settings
-from app.core.logging import logger
 from app.ai.reranker.base import RerankerProvider
 from app.ai.reranker.models import RerankResult
+from app.core.config import get_settings
+from app.core.logging import logger
 
 settings = get_settings()
 
 
 class CrossEncoderReranker(RerankerProvider):
-
     def __init__(self):
 
         self.model_name = settings.RERANKER_MODEL

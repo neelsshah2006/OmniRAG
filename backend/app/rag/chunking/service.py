@@ -1,8 +1,7 @@
-from app.rag.ingestion.models import Document
-
 from app.rag.chunking.base import Chunker
 from app.rag.chunking.recursive import RecursiveChunker
 from app.rag.chunking.unstructured import UnstructuredTitleChunker
+from app.rag.ingestion.models import Document
 
 
 class ChunkingService:

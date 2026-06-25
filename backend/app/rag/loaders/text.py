@@ -1,5 +1,5 @@
-from pathlib import Path
 import uuid
+from pathlib import Path
 
 from app.rag.ingestion.models import Document, DocumentElement
 from app.rag.loaders.base import DocumentLoader

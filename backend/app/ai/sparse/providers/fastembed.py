@@ -1,15 +1,14 @@
 from fastembed import SparseTextEmbedding
 
-from app.core.logging import logger
 from app.ai.sparse.base import SparseEmbeddingProvider
 from app.ai.sparse.models import SparseVector
 from app.core.config import get_settings
+from app.core.logging import logger
 
 settings = get_settings()
 
 
 class FastEmbedProvider(SparseEmbeddingProvider):
-
     def __init__(self):
 
         logger.info("Loading sparse embedding model")

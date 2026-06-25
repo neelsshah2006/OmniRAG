@@ -4,7 +4,6 @@ from app.cache.keys import generate_cache_key
 
 
 class EmbeddingCache:
-
     def __init__(self):
 
         self.cache = CacheService(
