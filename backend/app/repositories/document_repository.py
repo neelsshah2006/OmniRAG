@@ -45,8 +45,7 @@ class DocumentRepository:
         """
 
         self.session.add(document)
-        await self.session.commit()
-        await self.session.refresh(document)
+        await self.session.flush()
         return document
 
     async def get_by_id(
@@ -112,8 +111,7 @@ class DocumentRepository:
         document.status = status
         document.error_message = error
 
-        await self.session.commit()
-        await self.session.refresh(document)
+        await self.session.flush()
         return document
 
     async def update_ingestion_stats(
@@ -136,6 +134,5 @@ class DocumentRepository:
         document.element_count = element_count
         document.chunk_count = chunk_count
 
-        await self.session.commit()
-        await self.session.refresh(document)
+        await self.session.flush()
         return document

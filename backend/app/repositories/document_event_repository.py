@@ -51,8 +51,7 @@ class DocumentEventRepository:
         )
 
         self.session.add(event)
-        await self.session.commit()
-        await self.session.refresh(event)
+        await self.session.flush()
         return event
 
     async def get_by_document(
