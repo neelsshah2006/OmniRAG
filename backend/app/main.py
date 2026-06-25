@@ -26,6 +26,7 @@ from app.ai.vision.service import vision_service
 from app.rag.retrieval.service import retrieval_service
 from app.ai.sparse.service import sparse_embedding_service
 from app.ai.reranker.service import reranker_service
+from app.storage.database.init import init_database
 
 from app.middleware.request import RequestMiddleware
 
@@ -42,6 +43,9 @@ async def lifespan(app: FastAPI):
     # Infrastructure
     await redis_manager.connect()
     logger.info("Redis connected")
+
+    # Database
+    await init_database()
 
     # AI services
     await init_embedding_service()

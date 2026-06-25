@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     RERANKER_MODEL: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     MIN_RELEVANCE_SCORE: float = 0.3
 
+    # Database URL
+    DATABASE_URL: str = "sqlite+aiosqlite:///./omnirag.db"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
