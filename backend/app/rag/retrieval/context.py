@@ -15,7 +15,7 @@ class ContextBuilder:
         for index, chunk in enumerate(result.chunks, start=1):
             source = chunk.metadata.get("filename", "unknown")
             context_parts.append(
-                f"\n[Source {index}]\nFile: {source}\nRelevance Score: {chunk.score}\n\n{chunk.content}"
+                f"""\n[Source {index}]\n\nFile: {source}\n\nVector Score:\n{chunk.vector_score}\n\nRerank Score:\n{chunk.rerank_score}\n\nContent:\n{chunk.content}\n"""
             )
 
         return "\n".join(context_parts)

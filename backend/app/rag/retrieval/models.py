@@ -9,7 +9,8 @@ class RetrievedChunk(BaseModel):
 
     id: str
     content: str
-    score: float
+    vector_score: float | None = None
+    rerank_score: float | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 

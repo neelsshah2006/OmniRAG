@@ -1,10 +1,13 @@
+import asyncio
+
 from app.core.logging import logger
 from app.ai.embeddings.service import get_embedding_service
 from app.storage.vector.service import get_vector_service
-from app.storage.vector.models import VectorDocument
+from app.storage.vector.models import VectorDocument, StoredSparseVector
 from app.rag.chunking.service import chunking_service
 from app.rag.ingestion.models import Document
 from app.rag.processors.service import processor_pipeline
+from app.ai.sparse.service import sparse_embedding_service
 
 
 class IngestionPipeline:
@@ -36,19 +39,33 @@ class IngestionPipeline:
         chunks = chunker.chunk(document)
         logger.info(f"Created {len(chunks)} chunks")
 
-        # 3. Embed Chunks
+        # 3. Generate retrieval representations
         embedding_service = get_embedding_service()
+        sparse_service = sparse_embedding_service
         vector_service = get_vector_service()
         vector_documents = []
 
         for chunk in chunks:
             if not chunk.content.strip():
                 continue
-            embedding = await embedding_service.embed_text(chunk.content)
+
+            try:
+                dense_embedding, sparse_embedding = await asyncio.gather(
+                    embedding_service.embed_text(chunk.content),
+                    sparse_service.embed(chunk.content),
+                )
+            except Exception as e:
+                logger.error(f"Failed embedding chunk {chunk.id}: {e}")
+                continue
+
             vector_documents.append(
                 VectorDocument(
                     id=chunk.id,
-                    vector=embedding,
+                    dense_vector=dense_embedding,
+                    sparse_vector=StoredSparseVector(
+                        indices=sparse_embedding.indices,
+                        values=sparse_embedding.values,
+                    ),
                     payload={
                         "text": chunk.content,
                         "document_id": chunk.document_id,

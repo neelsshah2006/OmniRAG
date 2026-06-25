@@ -44,10 +44,23 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIMENSION: int = 384
 
+    # Sparse Embeddings
+    SPARSE_EMBEDDING_PROVIDER: str = "fastembed"
+    SPARSE_EMBEDDING_MODEL: str = "Qdrant/bm25"
+
     # Groq
     GROQ_API_KEY: str
     GROQ_MODEL: str = "llama-3.1-8b-instant"
     GROQ_VISION_MODEL: str = "meta-llama/llama-4-scout-17b-16e-instruct"
+
+    # Retrieval
+    RETRIEVAL_TOP_K: int = 20
+    RETRIEVAL_MODE: str = "dense"
+
+    # Reranker
+    RERANK_TOP_K: int = 5
+    RERANKER_MODEL: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    MIN_RELEVANCE_SCORE: float = 0.3
 
     model_config = SettingsConfigDict(
         env_file=".env",

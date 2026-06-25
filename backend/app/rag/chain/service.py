@@ -6,11 +6,8 @@ from app.ai.llm.models import (
     GenerationConfig,
 )
 from app.ai.llm.service import llm_service
-from app.rag.retrieval.retriever import retriever
-from app.rag.chain.models import (
-    RAGResponse,
-    SourceReference,
-)
+from app.rag.retrieval.pipeline import retrieval_pipeline
+from app.rag.chain.models import RAGResponse, SourceReference
 from app.rag.retrieval.context import context_builder
 from app.ai.prompts.rag import RAG_SYSTEM_PROMPT, build_rag_user_prompt
 
@@ -29,7 +26,7 @@ class RAGChain:
     async def ask(self, question: str) -> RAGResponse:
         start_time = time.perf_counter()
         logger.info("Starting RAG Chain")
-        retrieval_result = await retriever.retrieve(query=question)
+        retrieval_result = await retrieval_pipeline.retrieve(query=question)
         context = context_builder.build(retrieval_result)
         messages = [
             ChatMessage(
@@ -55,7 +52,8 @@ class RAGChain:
                 SourceReference(
                     content=chunk.content,
                     metadata=chunk.metadata,
-                    score=chunk.score,
+                    vector_score=chunk.vector_score,
+                    rerank_score=chunk.rerank_score,
                 )
                 for chunk in retrieval_result.chunks
             ],

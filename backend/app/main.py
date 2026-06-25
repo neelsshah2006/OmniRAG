@@ -23,6 +23,9 @@ from app.storage.vector.service import (
 )
 from app.ai.llm.service import llm_service
 from app.ai.vision.service import vision_service
+from app.rag.retrieval.service import retrieval_service
+from app.ai.sparse.service import sparse_embedding_service
+from app.ai.reranker.service import reranker_service
 
 from app.middleware.request import RequestMiddleware
 
@@ -45,14 +48,27 @@ async def lifespan(app: FastAPI):
     embedding_service = get_embedding_service()
     logger.info("Embedding service loaded")
 
+    # Sparse embeddings
+    sparse_embedding_service.initialize()
+    logger.info("Sparse embedding service loaded")
+
     # Vector database
     await init_vector_service(dimension=embedding_service.dimension)
     logger.info("Vector Service loaded")
+
+    # Retrieval Service
+    retrieval_service.initialize()
+    logger.info("Retrieval service loaded")
+
+    # Reranker Service
+    reranker_service.initialize()
+    logger.info("Reranker service loaded")
 
     # LLM service
     llm_service.initialize()
     logger.info("LLM Service loaded")
 
+    # Vision Service
     vision_service.initialize()
     logger.info("Vision Service loaded")
 

@@ -8,7 +8,8 @@ class SourceReference(BaseModel):
 
     content: str
     metadata: dict = Field(default_factory=dict)
-    score: float
+    vector_score: float | None = None
+    rerank_score: float | None = None
 
 
 class RAGResponse(BaseModel):

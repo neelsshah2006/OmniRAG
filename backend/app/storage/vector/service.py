@@ -56,6 +56,19 @@ class VectorService:
             limit=limit,
         )
 
+    async def hybrid_search(
+        self,
+        dense_vector,
+        sparse_vector,
+        limit,
+    ):
+
+        return await self.store.hybrid_search(
+            dense_vector=dense_vector,
+            sparse_vector=sparse_vector,
+            limit=limit,
+        )
+
     async def delete(
         self,
         ids: list[str],
