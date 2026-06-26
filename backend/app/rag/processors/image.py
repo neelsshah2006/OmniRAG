@@ -1,5 +1,3 @@
-import asyncio
-
 from app.ai.prompts.vision import DOCUMENT_IMAGE_ANALYSIS_PROMPT
 from app.ai.vision.service import vision_service
 from app.core.logging import logger
@@ -34,7 +32,10 @@ class ImageProcessor(DocumentProcessor):
             for element in image_elements
         ]
 
-        logger.info("Generating image summary")
+        logger.info(
+            "Generating {} image summaries",
+            len(image_elements),
+        )
 
         responses = await gather_with_limit(
             tasks,

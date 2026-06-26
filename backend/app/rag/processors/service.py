@@ -1,3 +1,5 @@
+import asyncio
+
 from app.core.logging import logger
 from app.rag.ingestion.models import Document
 from app.rag.processors.base import DocumentProcessor
@@ -23,11 +25,21 @@ class ProcessorPipeline:
 
     async def process(self, document: Document) -> Document:
 
-        logger.info(f"Running {len(self.processors)} document processors")
+        logger.info(
+            "Running {} document processors",
+            len(self.processors),
+        )
+
+        tasks = []
 
         for processor in self.processors:
-            logger.info(f"Running processor: {processor.__class__.__name__}")
-            document = await processor.process(document)
+            logger.info(
+                "Scheduling processor: {}",
+                processor.__class__.__name__,
+            )
+            tasks.append(processor.process(document))
+
+        await asyncio.gather(*tasks)
 
         return document
 
