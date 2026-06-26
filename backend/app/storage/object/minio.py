@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import IO
 
 from minio import Minio
 
@@ -28,26 +29,50 @@ class MinIOStorage(ObjectStorage):
 
         logger.info("MinIO connected")
 
-    async def upload(
+    async def upload_stream(
+        self,
+        stream: IO[bytes],
+        size: int,
+        key: str,
+        content_type: str | None = None,
+    ) -> StoredObject:
+        """
+        Upload a binary stream to object storage.
+        """
+
+        self.client.put_object(
+            bucket_name=self.bucket,
+            object_name=key,
+            data=stream,
+            length=size,
+            content_type=content_type,
+        )
+
+        logger.info(f"Uploaded object: {key}")
+
+        return StoredObject(
+            key=key,
+            size=size,
+            content_type=content_type,
+        )
+
+    async def upload_path(
         self,
         path: Path,
         key: str,
         content_type: str | None = None,
     ) -> StoredObject:
+        """
+        Upload an existing file.
+        """
 
-        self.client.fput_object(
-            bucket_name=settings.MINIO_BUCKET,
-            object_name=key,
-            file_path=str(path),
-            content_type=content_type,
-        )
-
-        return StoredObject(
-            bucket=settings.MINIO_BUCKET,
-            key=key,
-            size=path.stat().st_size,
-            content_type=content_type,
-        )
+        with path.open("rb") as stream:
+            return await self.upload_stream(
+                stream=stream,
+                size=path.stat().st_size,
+                key=key,
+                content_type=content_type,
+            )
 
     async def download(
         self,

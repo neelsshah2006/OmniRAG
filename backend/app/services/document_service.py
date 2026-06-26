@@ -1,5 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import IO
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -36,19 +37,49 @@ class DocumentService:
         self.document_repo = DocumentRepository(session=session)
         self.event_repo = DocumentEventRepository(session=session)
 
-    async def ingest_file(
+    @staticmethod
+    def _object_key(
+        document_id: str,
+        filename: str,
+    ) -> str:
+        return f"documents/{document_id}/{filename}"
+
+    async def create_document(
         self,
-        path: Path,
+        *,
+        filename: str,
+        stream: IO[bytes],
+        size: int,
         content_type: str | None = None,
     ) -> Document:
+        """
+        Registers a newly uploaded document.
 
-        logger.info(f"Creating document workflow: {path.name}")
+        Responsibilities:
+        - Create the document metadata record
+        - Upload the original file to object storage (MinIO)
+        - Store the object storage reference
+        - Record upload lifecycle events
+
+        Does NOT:
+        - Parse the document
+        - Generate chunks or embeddings
+        - Index content into the vector database
+
+        Processing is performed separately by `process_document()`,
+        allowing asynchronous/background ingestion and document reprocessing.
+        """
+
+        logger.info(
+            "Creating document: {}",
+            filename,
+        )
 
         async with self.session.begin():
             document = await self.document_repo.create(
                 Document(
-                    filename=path.name,
-                    file_size=path.stat().st_size,
+                    filename=filename,
+                    file_size=size,
                     content_type=content_type,
                 )
             )
@@ -59,21 +90,17 @@ class DocumentService:
                 "Document uploaded",
             )
 
-            await self.document_repo.update_status(
-                document.id,
-                DocumentStatus.PROCESSING,
-            )
-
-            await self.event_repo.create(
-                document.id,
-                DocumentEventType.PROCESSING_STARTED,
-            )
+        stored_object = None
+        object_storage = get_object_storage()
+        object_key = self._object_key(
+            document_id=document.id,
+            filename=filename,
+        )
 
         try:
-            object_storage = get_object_storage()
-            object_key = f"documents/{document.id}/{path.name}"
-            stored_object = await object_storage.upload(
-                path=path,
+            stored_object = await object_storage.upload_stream(
+                stream=stream,
+                size=size,
                 key=object_key,
                 content_type=content_type,
             )
@@ -84,6 +111,56 @@ class DocumentService:
                     stored_object.key,
                 )
 
+        except Exception:
+            if stored_object is not None:
+                await object_storage.delete(
+                    stored_object.key,
+                )
+
+            async with self.session.begin():
+                await self.document_repo.delete(document.id)
+
+            raise
+
+        return document
+
+    async def process_document(
+        self,
+        document_id: str,
+    ) -> None:
+        """
+        Processes an uploaded document into searchable knowledge.
+
+        Responsibilities:
+        - Download the original file from object storage
+        - Parse and enrich the document
+        - Generate chunks and embeddings
+        - Store searchable vectors
+        - Update processing status and events
+
+        This method can be executed synchronously or
+        scheduled as a background task.
+        """
+
+        document = await self.document_repo.get_by_id(document_id)
+        if document is None:
+            raise ValueError(f"Document '{document_id}' not found.")
+
+        object_storage = get_object_storage()
+        logger.info(f"Processing document: {document.id}")
+
+        try:
+            async with self.session.begin():
+                await self.document_repo.update_status(
+                    document.id,
+                    DocumentStatus.PROCESSING,
+                )
+
+                await self.event_repo.create(
+                    document.id,
+                    DocumentEventType.PROCESSING_STARTED,
+                )
+
                 await self.event_repo.create(
                     document.id,
                     DocumentEventType.PARSING_STARTED,
@@ -92,10 +169,12 @@ class DocumentService:
 
             with TemporaryDirectory() as temp_dir:
                 temp_path = Path(temp_dir) / document.filename
+
                 await object_storage.download(
-                    key=stored_object.key,
+                    key=document.file_path,
                     destination=temp_path,
                 )
+
                 parsed_document = await loader_service.load(str(temp_path))
 
             parsed_document.id = document.id
@@ -127,6 +206,8 @@ class DocumentService:
                     {"chunks": chunk_count},
                 )
 
+            logger.success(f"Processed document: {document.id}")
+
         except Exception as error:
             logger.exception("Document ingestion failed")
 
@@ -142,5 +223,3 @@ class DocumentService:
                     DocumentEventType.FAILED,
                     str(error),
                 )
-
-        return await self.document_repo.get_by_id(document.id)

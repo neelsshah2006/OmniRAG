@@ -6,8 +6,10 @@ from fastapi import (
     Depends,
     File,
     UploadFile,
+    BackgroundTasks,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from tempfile import NamedTemporaryFile
 
 from app.schemas.document import DocumentResponse
 from app.services.document_service import DocumentService
@@ -17,43 +19,31 @@ router = APIRouter()
 get_db = get_session
 
 
-UPLOAD_DIR = Path("data/uploads")
-
-UPLOAD_DIR.mkdir(
-    parents=True,
-    exist_ok=True,
-)
-
-
 @router.post(
     "/upload",
     response_model=DocumentResponse,
 )
 async def upload_document(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     session: AsyncSession = Depends(get_db),
 ):
     """
-    Upload a document and start ingestion.
-
-    Handles:
-    - file persistence
-    - parsing
-    - chunking
-    - indexing
+    Upload a document and start asynchronous ingestion.
     """
-
-    file_path = UPLOAD_DIR / file.filename
-
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(
-            file.file,
-            buffer,
-        )
 
     service = DocumentService(session=session)
 
-    return await service.ingest_file(
-        path=file_path,
+    document = await service.create_document(
+        filename=file.filename,
+        stream=file.file,
+        size=file.size,
         content_type=file.content_type,
     )
+
+    background_tasks.add_task(
+        service.process_document,
+        document.id,
+    )
+
+    return document
