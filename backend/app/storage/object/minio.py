@@ -27,6 +27,7 @@ class MinIOStorage(ObjectStorage):
         if not self.client.bucket_exists(settings.MINIO_BUCKET):
             self.client.make_bucket(settings.MINIO_BUCKET)
 
+        self.bucket = settings.MINIO_BUCKET
         logger.info("MinIO connected")
 
     async def upload_stream(
@@ -51,6 +52,7 @@ class MinIOStorage(ObjectStorage):
         logger.info(f"Uploaded object: {key}")
 
         return StoredObject(
+            bucket=self.bucket,
             key=key,
             size=size,
             content_type=content_type,

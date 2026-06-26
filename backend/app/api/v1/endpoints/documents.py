@@ -9,11 +9,11 @@ from fastapi import (
     BackgroundTasks,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from tempfile import NamedTemporaryFile
 
 from app.schemas.document import DocumentResponse
 from app.services.document_service import DocumentService
 from app.storage.database.session import get_session
+from app.tasks.document import process_document_task
 
 router = APIRouter()
 get_db = get_session
@@ -42,7 +42,7 @@ async def upload_document(
     )
 
     background_tasks.add_task(
-        service.process_document,
+        process_document_task,
         document.id,
     )
 

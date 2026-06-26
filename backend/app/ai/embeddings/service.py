@@ -80,20 +80,23 @@ class EmbeddingService:
             len(missing_texts),
         )
 
-        new_vectors = await self.provider.embed_batch(missing_texts)
-        for index, text, vector in zip(
-            missing_indices,
-            missing_texts,
-            new_vectors,
-        ):
-            await embedding_cache.set_embedding(
-                text=text,
-                model=self.model_name,
-                embedding=vector,
-            )
-            results[index] = vector
+        if missing_texts:
+            new_vectors = await self.provider.embed_batch(missing_texts)
+
+            for index, text, vector in zip(
+                missing_indices,
+                missing_texts,
+                new_vectors,
+            ):
+                await embedding_cache.set_embedding(
+                    text=text,
+                    model=self.model_name,
+                    embedding=vector,
+                )
+                results[index] = vector
 
         assert all(result is not None for result in results)
+        return [result for result in results]
 
     @property
     def dimension(self):

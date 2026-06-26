@@ -21,3 +21,18 @@ class FastEmbedProvider(SparseEmbeddingProvider):
             indices=embedding.indices.tolist(),
             values=embedding.values.tolist(),
         )
+    
+    async def embed_batch(
+        self,
+        texts: list[str],
+    ) -> list[SparseVector]:
+
+        embeddings = list(self.model.embed(texts))
+
+        return [
+            SparseVector(
+                indices=embedding.indices.tolist(),
+                values=embedding.values.tolist(),
+            )
+            for embedding in embeddings
+        ]

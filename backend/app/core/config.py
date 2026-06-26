@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str
     GROQ_MODEL: str = "llama-3.1-8b-instant"
     GROQ_VISION_MODEL: str = "meta-llama/llama-4-scout-17b-16e-instruct"
+    MAX_CONCURRENT_AI_REQUESTS: int = 5
 
     # Retrieval
     RETRIEVAL_TOP_K: int = 20

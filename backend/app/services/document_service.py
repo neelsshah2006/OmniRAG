@@ -141,16 +141,15 @@ class DocumentService:
         This method can be executed synchronously or
         scheduled as a background task.
         """
-
-        document = await self.document_repo.get_by_id(document_id)
-        if document is None:
-            raise ValueError(f"Document '{document_id}' not found.")
-
-        object_storage = get_object_storage()
-        logger.info(f"Processing document: {document.id}")
-
         try:
             async with self.session.begin():
+                document = await self.document_repo.get_by_id(document_id)
+                if document is None:
+                    raise ValueError(f"Document '{document_id}' not found.")
+
+                object_storage = get_object_storage()
+                logger.info(f"Processing document: {document.id}")
+
                 await self.document_repo.update_status(
                     document.id,
                     DocumentStatus.PROCESSING,
@@ -211,6 +210,7 @@ class DocumentService:
         except Exception as error:
             logger.exception("Document ingestion failed")
 
+            await self.session.rollback()
             async with self.session.begin():
                 await self.document_repo.update_status(
                     document.id,

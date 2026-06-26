@@ -1,3 +1,4 @@
+from app.ai.sparse.models import SparseVector
 from app.ai.sparse.providers.fastembed import FastEmbedProvider
 from app.core.config import get_settings
 from app.core.logging import logger
@@ -21,12 +22,22 @@ class SparseEmbeddingService:
 
         logger.success("Sparse embeddings ready")
 
-    async def embed(self, text: str):
+    async def embed(self, text: str) -> SparseVector:
 
         if self.provider is None:
             raise RuntimeError("Sparse embeddings not initialized")
 
         return await self.provider.embed(text)
+
+    async def embed_batch(
+        self,
+        texts: list[str],
+    ) -> list[SparseVector]:
+
+        if self.provider is None:
+            raise RuntimeError("Sparse embeddings not initialized")
+
+        return await self.provider.embed_batch(texts)
 
 
 sparse_embedding_service = SparseEmbeddingService()

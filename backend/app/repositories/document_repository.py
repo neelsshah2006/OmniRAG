@@ -149,3 +149,23 @@ class DocumentRepository:
 
         await self.session.flush()
         return document
+
+    async def delete(
+        self,
+        document_id: str,
+    ) -> bool:
+        """
+        Delete a document from the database.
+
+        Returns True if the document existed,
+        otherwise False.
+        """
+
+        document = await self.get_by_id(document_id)
+        if document is None:
+            return False
+
+        await self.session.delete(document)
+        await self.session.flush()
+
+        return True
