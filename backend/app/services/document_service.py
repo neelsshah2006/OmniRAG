@@ -50,6 +50,7 @@ class DocumentService:
         filename: str,
         stream: IO[bytes],
         size: int,
+        content_hash: str,
         content_type: str | None = None,
     ) -> Document:
         """
@@ -81,6 +82,7 @@ class DocumentService:
                     filename=filename,
                     file_size=size,
                     content_type=content_type,
+                    content_hash=content_hash,
                 )
             )
 

@@ -64,6 +64,25 @@ class DocumentRepository:
 
         return results.scalar_one_or_none()
 
+    async def get_by_content_hash(
+        self,
+        content_hash: str,
+    ) -> Document | None:
+        """
+        Retrieve a document by its content hash.
+
+        Used to detect duplicate uploads before
+        starting the ingestion pipeline.
+        """
+
+        result = await self.session.execute(
+            select(Document).where(
+                Document.content_hash == content_hash,
+            )
+        )
+
+        return result.scalar_one_or_none()
+
     async def get_all(
         self,
         limit: int = 50,

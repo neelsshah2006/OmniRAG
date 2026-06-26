@@ -72,6 +72,13 @@ class Document(Base):
         nullable=True,
     )
 
+    content_hash: Mapped[str] = mapped_column(
+        String(64),
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
     status: Mapped[DocumentStatus] = mapped_column(
         SQLEnum(DocumentStatus),
         default=DocumentStatus.UPLOADED,
