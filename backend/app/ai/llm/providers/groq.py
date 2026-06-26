@@ -1,11 +1,17 @@
 import time
-
-from groq import AsyncGroq
+from groq import (
+    APIConnectionError,
+    APITimeoutError,
+    InternalServerError,
+    RateLimitError,
+    AsyncGroq,
+)
 
 from app.ai.llm.base import LLMProvider
 from app.ai.llm.models import ChatMessage, GenerationConfig, LLMResponse
 from app.core.config import get_settings
 from app.core.logging import logger
+from app.utils.retry import retry_async
 
 settings = get_settings()
 
@@ -37,11 +43,21 @@ class GroqProvider(LLMProvider):
                 messages=len(messages),
             )
 
-            response = await self.client.chat.completions.create(
+            response = await retry_async(
+                self.client.chat.completions.create,
                 model=self.model,
                 messages=[message.model_dump() for message in messages],
                 temperature=config.temperature,
                 max_tokens=config.max_tokens,
+                retries=settings.AI_MAX_RETRIES,
+                base_delay=settings.AI_RETRY_BASE_DELAY,
+                retry_exceptions=(
+                    RateLimitError,
+                    InternalServerError,
+                    APIConnectionError,
+                    APITimeoutError,
+                ),
+                operation="Groq Chat Completion",
             )
 
             latency_ms = (time.perf_counter() - start_time) * 1000
