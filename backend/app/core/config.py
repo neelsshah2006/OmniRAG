@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     # Embeddings
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIMENSION: int = 384
+    EMBEDDING_BATCH_SIZE: int = 64
 
     # Sparse Embeddings
     SPARSE_EMBEDDING_PROVIDER: str = "fastembed"

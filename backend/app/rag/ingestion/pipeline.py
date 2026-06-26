@@ -43,28 +43,54 @@ class IngestionPipeline:
         embedding_service = get_embedding_service()
         sparse_service = sparse_embedding_service
         vector_service = get_vector_service()
-        vector_documents = []
 
-        for chunk in chunks:
-            if not chunk.content.strip():
-                continue
+        valid_chunks = [chunk for chunk in chunks if chunk.content.strip()]
+        if not valid_chunks:
+            logger.warning(
+                "No valid chunks generated for document: {}",
+                document.id,
+            )
+            return 0
 
-            try:
-                dense_embedding, sparse_embedding = await asyncio.gather(
-                    embedding_service.embed_text(chunk.content),
-                    sparse_service.embed(chunk.content),
+        texts = [chunk.content for chunk in valid_chunks]
+
+        try:
+            logger.info(
+                "Embedding {} chunks in batch",
+                len(valid_chunks),
+            )
+
+            dense_vectors, sparse_vectors = await asyncio.gather(
+                embedding_service.embed_batch(texts),
+                sparse_service.embed_batch(texts),
+            )
+            if len(dense_vectors) != len(valid_chunks) or len(sparse_vectors) != len(
+                valid_chunks
+            ):
+                raise RuntimeError(
+                    "Embedding services returned inconsistent batch sizes."
                 )
-            except Exception as e:
-                logger.error(f"Failed embedding chunk {chunk.id}: {e}")
-                continue
 
+        except Exception:
+            logger.exception(
+                "Embedding generation failed for document: {}",
+                document.id,
+            )
+            raise
+
+        vector_documents: list[VectorDocument] = []
+        for chunk, dense_vector, sparse_vector in zip(
+            valid_chunks,
+            dense_vectors,
+            sparse_vectors,
+        ):
             vector_documents.append(
                 VectorDocument(
                     id=chunk.id,
-                    dense_vector=dense_embedding,
+                    dense_vector=dense_vector,
                     sparse_vector=StoredSparseVector(
-                        indices=sparse_embedding.indices,
-                        values=sparse_embedding.values,
+                        indices=sparse_vector.indices,
+                        values=sparse_vector.values,
                     ),
                     payload={
                         "text": chunk.content,
@@ -76,10 +102,6 @@ class IngestionPipeline:
                     },
                 )
             )
-
-        if not vector_documents:
-            logger.warning(f"No valid chunks generated for document: {document.id}")
-            return 0
 
         await vector_service.add_documents(vector_documents)
         logger.success(f"Ingested document: {document.id}")

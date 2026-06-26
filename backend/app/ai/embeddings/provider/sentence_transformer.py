@@ -3,6 +3,9 @@ import asyncio
 from sentence_transformers import SentenceTransformer
 
 from app.ai.embeddings.base import EmbeddingProvider
+from app.core.config import get_settings
+
+settings = get_settings()
 
 
 class SentenceTransformerProvider(EmbeddingProvider):
@@ -25,6 +28,7 @@ class SentenceTransformerProvider(EmbeddingProvider):
             self._model.encode,
             text,
             normalize_embeddings=True,
+            show_progress_bar=False,
         )
 
         return embeddings.tolist()
@@ -33,11 +37,16 @@ class SentenceTransformerProvider(EmbeddingProvider):
         self,
         texts: list[str],
     ) -> list[list[float]]:
+        """
+        Generate embeddings for multiple texts in a single model call.
+        """
 
         embeddings = await asyncio.to_thread(
             self._model.encode,
             texts,
+            batch_size=settings.EMBEDDING_BATCH_SIZE,
             normalize_embeddings=True,
+            show_progress_bar=False,
         )
 
         return embeddings.tolist()
