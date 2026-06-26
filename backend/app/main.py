@@ -15,6 +15,7 @@ from app.ai.llm.service import llm_service
 from app.ai.reranker.service import reranker_service
 from app.ai.sparse.service import sparse_embedding_service
 from app.ai.vision.service import vision_service
+from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.exceptions import (
     OmniRAGException,
@@ -25,10 +26,8 @@ from app.core.redis import redis_manager
 from app.middleware.request import RequestMiddleware
 from app.rag.retrieval.service import retrieval_service
 from app.storage.database.init import init_database
-from app.storage.vector.service import (
-    close_vector_service,
-    init_vector_service,
-)
+from app.storage.object.service import init_object_storage
+from app.storage.vector.service import close_vector_service, init_vector_service
 
 settings = get_settings()
 
@@ -43,6 +42,8 @@ async def lifespan(app: FastAPI):
     # Infrastructure
     await redis_manager.connect()
     logger.info("Redis connected")
+
+    init_object_storage()
 
     # Database
     await init_database()
@@ -102,6 +103,11 @@ app.add_exception_handler(
 )
 
 app.add_middleware(RequestMiddleware)
+
+app.include_router(
+    api_router,
+    prefix="/api/v1",
+)
 
 
 @app.get("/health")

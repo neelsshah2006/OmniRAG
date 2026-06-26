@@ -114,6 +114,19 @@ class DocumentRepository:
         await self.session.flush()
         return document
 
+    async def update_file_path(
+        self,
+        document_id: str,
+        file_path: str,
+    ) -> Document | None:
+        document = await self.get_by_id(document_id)
+        if not document:
+            return None
+
+        document.file_path = file_path
+
+        return document
+
     async def update_ingestion_stats(
         self,
         document_id: str,

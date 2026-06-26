@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +10,7 @@ from app.rag.ingestion.pipeline import ingestion_pipeline
 from app.rag.loaders.service import loader_service
 from app.repositories.document_event_repository import DocumentEventRepository
 from app.repositories.document_repository import DocumentRepository
+from app.storage.object.service import get_object_storage
 
 
 class DocumentService:
@@ -46,7 +48,6 @@ class DocumentService:
             document = await self.document_repo.create(
                 Document(
                     filename=path.name,
-                    file_path=str(path),
                     file_size=path.stat().st_size,
                     content_type=content_type,
                 )
@@ -69,15 +70,33 @@ class DocumentService:
             )
 
         try:
-            await self.event_repo.create(
-                document.id,
-                DocumentEventType.PARSING_STARTED,
-                "Parsing document",
+            object_storage = get_object_storage()
+            object_key = f"documents/{document.id}/{path.name}"
+            stored_object = await object_storage.upload(
+                path=path,
+                key=object_key,
+                content_type=content_type,
             )
 
-            await self.session.commit()
+            async with self.session.begin():
+                await self.document_repo.update_file_path(
+                    document.id,
+                    stored_object.key,
+                )
 
-            parsed_document = await loader_service.load(str(path))
+                await self.event_repo.create(
+                    document.id,
+                    DocumentEventType.PARSING_STARTED,
+                    "Parsing document",
+                )
+
+            with TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir) / document.filename
+                await object_storage.download(
+                    key=stored_object.key,
+                    destination=temp_path,
+                )
+                parsed_document = await loader_service.load(str(temp_path))
 
             parsed_document.id = document.id
 
