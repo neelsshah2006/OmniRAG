@@ -38,8 +38,9 @@ class Settings(BaseSettings):
     QDRANT_HOST: str = "localhost"
     QDRANT_PORT: int = 6333
     QDRANT_COLLECTION: str = "omnirag_chunks"
+    VECTOR_UPSERT_BATCH_SIZE: int = 256
 
-    # Embeddings
+    # Vector Embeddings
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIMENSION: int = 384
     EMBEDDING_BATCH_SIZE: int = 64

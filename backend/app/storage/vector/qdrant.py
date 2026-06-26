@@ -1,3 +1,5 @@
+import time
+
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import (
     Distance,
@@ -14,6 +16,7 @@ from app.core.config import get_settings
 from app.core.logging import logger
 from app.storage.vector.base import VectorStore
 from app.storage.vector.models import VectorDocument, VectorSearchResult
+from app.utils.batch import batched
 
 settings = get_settings()
 
@@ -83,12 +86,24 @@ class QdrantVectorStore(VectorStore):
                 )
             )
 
-        await self.client.upsert(
-            collection_name=self.collection,
-            points=points,
-        )
+        start = time.perf_counter()
 
-        logger.info(f"Inserted {len(points)} vectors")
+        for batch in batched(
+            points,
+            settings.VECTOR_UPSERT_BATCH_SIZE,
+        ):
+            await self.client.upsert(
+                collection_name=self.collection,
+                points=batch,
+            )
+
+        elapsed = time.perf_counter() - start
+
+        logger.info(
+            "Indexed {} vectors in {:.2f}s",
+            len(points),
+            elapsed,
+        )
 
     async def search(
         self,
