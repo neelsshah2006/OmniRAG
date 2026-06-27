@@ -21,7 +21,7 @@ class FastEmbedProvider(SparseEmbeddingProvider):
             indices=embedding.indices.tolist(),
             values=embedding.values.tolist(),
         )
-    
+
     async def embed_batch(
         self,
         texts: list[str],

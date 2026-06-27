@@ -12,10 +12,10 @@ class ContextBuilder:
             return "No relevant context found"
 
         context_parts = []
-        for index, chunk in enumerate(result.chunks, start=1):
+        for chunk in result.chunks:
             source = chunk.metadata.get("filename", "unknown")
             context_parts.append(
-                f"""\n[Source {index}]\n\nFile: {source}\n\nVector Score:\n{chunk.vector_score}\n\nRerank Score:\n{chunk.rerank_score}\n\nContent:\n{chunk.content}\n"""
+                f"""\n[File: {source}\nMetadata: {chunk.metadata}]\n\nVector Score:\n{chunk.vector_score}\n\nRerank Score:\n{chunk.rerank_score}\n\nContent:\n{chunk.content}\n"""
             )
 
         return "\n".join(context_parts)

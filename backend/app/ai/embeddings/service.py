@@ -58,7 +58,6 @@ class EmbeddingService:
         missing_texts = []
 
         for i, text in enumerate(texts):
-
             if not text.strip():
                 raise ValueError("Cannot embed empty text")
 

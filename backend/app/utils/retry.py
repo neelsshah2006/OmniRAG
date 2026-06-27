@@ -33,7 +33,6 @@ async def retry_async(
             return await func(*args, **kwargs)
 
         except retry_exceptions as error:
-
             if attempt == retries:
                 logger.exception(
                     "{} failed after {} retries",
